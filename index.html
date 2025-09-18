@@ -1743,6 +1743,10 @@
             <label for="function-key-input">Function Key</label>
             <input type="text" id="function-key-input" placeholder="Enter your Azure Function key" />
           </div>
+          <div class="form-group">
+            <label for="user-guid-input">User GUID</label>
+            <input type="text" id="user-guid-input" placeholder="Enter your User GUID" />
+          </div>
         </div>
         <div class="settings-section">
           <h3>Data Management</h3>
@@ -1831,6 +1835,9 @@
         this.azureFunctionUrl = this.settings.azureFunctionUrl || 
           "https://redesigned-space-system-p7jqqg574r3r4gv-7071.app.github.dev/api/businessinsightbot_function";
         this.functionKey = localStorage.getItem("functionKey");
+        
+        // Load User GUID from settings or use default
+        this.userGuid = this.settings.userGuid || "c0p110t0-aaaa-bbbb-cccc-123456789abc";
       }
 
       loadUsers() {
@@ -1854,7 +1861,8 @@
             autoSpeak: false,
             azureTTSKey: "",
             ttsVoiceName: "en-US-JennyNeural",
-            azureFunctionUrl: ""
+            azureFunctionUrl: "",
+            userGuid: "c0p110t0-aaaa-bbbb-cccc-123456789abc"
           };
       }
 
@@ -2011,7 +2019,8 @@
           autoSpeak: false,
           azureTTSKey: "",
           ttsVoiceName: "en-US-JennyNeural",
-          azureFunctionUrl: ""
+          azureFunctionUrl: "",
+          userGuid: "c0p110t0-aaaa-bbbb-cccc-123456789abc"
         };
       }
 
@@ -3502,7 +3511,7 @@
         this.showLoadingIndicator();
 
         try {
-          // Send to Azure Function
+          // Send to Azure Function with configured GUID
           const response = await fetch(appState.azureFunctionUrl, {
             method: "POST",
             headers: {
@@ -3512,7 +3521,7 @@
             body: JSON.stringify({
               user_input: message || "Please analyze this image",
               conversation_history: chat.messages,
-              user_guid: appState.currentUser.id,
+              user_guid: appState.userGuid, // Use the configured GUID
             }),
           });
 
@@ -3659,7 +3668,7 @@
 
         const exportData = {
           conversation: conversation,
-          guid: appState.currentUser.id,
+          guid: appState.userGuid, // Use the configured GUID
           timestamp: new Date().toISOString(),
           appName: "_",
         };
@@ -3908,6 +3917,19 @@
           localStorage.setItem("functionKey", functionKey);
         }
 
+        // Save User GUID
+        const userGuid = document
+          .getElementById("user-guid-input")
+          .value.trim();
+        if (userGuid) {
+          appState.settings.userGuid = userGuid;
+          appState.userGuid = userGuid;
+        } else {
+          // If empty, use default
+          appState.settings.userGuid = "c0p110t0-aaaa-bbbb-cccc-123456789abc";
+          appState.userGuid = "c0p110t0-aaaa-bbbb-cccc-123456789abc";
+        }
+
         // Save all settings to localStorage
         appState.saveSettings();
 
@@ -3986,6 +4008,12 @@
           document.getElementById("function-key-input");
         if (functionKeyInput && appState.functionKey) {
           functionKeyInput.value = appState.functionKey;
+        }
+
+        // Update User GUID input
+        const userGuidInput = document.getElementById("user-guid-input");
+        if (userGuidInput) {
+          userGuidInput.value = appState.userGuid;
         }
       }
 
