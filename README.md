@@ -1,3 +1,7 @@
+<!-- retired-notice:start -->
+> **Archived.** No longer maintained; kept public for reference.
+<!-- retired-notice:end -->
+
 # Copilot Agent 365 - Enterprise AI Assistant
 
 ## 🚀 One-Click Setup - Fully Automated!
